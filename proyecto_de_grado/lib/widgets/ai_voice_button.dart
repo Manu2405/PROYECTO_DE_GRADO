@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../core/theme/app_theme.dart';
+import 'ai_voice_chat_screen.dart';
 
 class AiVoiceButton extends StatefulWidget {
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final String? userName;
 
-  const AiVoiceButton({super.key, required this.onTap});
+  const AiVoiceButton({super.key, this.onTap, this.userName});
 
   @override
   State<AiVoiceButton> createState() => _AiVoiceButtonState();
@@ -14,24 +16,32 @@ class AiVoiceButton extends StatefulWidget {
 
 class _AiVoiceButtonState extends State<AiVoiceButton> with SingleTickerProviderStateMixin {
   bool _isListening = false;
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+  late AnimationController _breathingController;
+  late Animation<double> _breathingAnimation;
+  late Animation<double> _iconScaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
+    _breathingController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
     );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    
+    // Animación de respiración: crece y se encoge
+    _breathingAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
+      CurvedAnimation(parent: _breathingController, curve: Curves.easeInOut),
+    );
+    
+    // Animación del icono
+    _iconScaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+      CurvedAnimation(parent: _breathingController, curve: Curves.easeInOut),
     );
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _breathingController.dispose();
     super.dispose();
   }
 
@@ -39,46 +49,119 @@ class _AiVoiceButtonState extends State<AiVoiceButton> with SingleTickerProvider
     setState(() {
       _isListening = !_isListening;
       if (_isListening) {
-        _pulseController.repeat(reverse: true);
-        widget.onTap();
-        // Simulate a timeout where the AI finishes listening after 5 seconds
-        Future.delayed(const Duration(seconds: 5), () {
+        _breathingController.repeat(reverse: true);
+        if (widget.onTap != null) {
+          widget.onTap!();
+        }
+        Future.delayed(const Duration(seconds: 3), () {
           if (mounted && _isListening) {
             _toggleListening();
-            _showSuccessDialog();
+            _showVoiceInputDialog();
           }
         });
       } else {
-        _pulseController.stop();
-        _pulseController.value = 1.0;
+        _breathingController.stop();
+        _breathingController.value = 0;
       }
     });
   }
 
-  void _showSuccessDialog() {
+  void _showVoiceInputDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: AppTheme.successColor, size: 32),
-            const SizedBox(width: 10),
-            const Text('Receta Guardada'),
-          ],
-        ),
-        content: const Text(
-          'He registrado la nueva medicación correctamente. Te recordaré cuando sea hora de tomarla.',
-          style: TextStyle(fontSize: 18),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Entendido', style: TextStyle(fontSize: 18)),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: Container(
+          height: 400,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(40),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 30,
+                offset: Offset(0, 15),
+              ),
+            ],
           ),
-        ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 60,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const Text(
+                '🎙️ Escuchando...',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Habla sobre tu medicamento o consulta',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.primaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                      blurRadius: 30,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.microphone,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              const ListeningDots(),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    );
+    ).then((_) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AiVoiceChatScreen(userName: widget.userName ?? "Usuario"),
+        ),
+      );
+    });
   }
 
   @override
@@ -90,30 +173,37 @@ class _AiVoiceButtonState extends State<AiVoiceButton> with SingleTickerProvider
           FadeInUp(
             duration: const Duration(milliseconds: 300),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              margin: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              margin: const EdgeInsets.only(bottom: 15),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceColor,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
+                color: AppTheme.primaryColor,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
                 ],
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  LottieListeningDots(),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Te estoy escuchando...',
+                  SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Escuchando...',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
                 ],
@@ -123,55 +213,103 @@ class _AiVoiceButtonState extends State<AiVoiceButton> with SingleTickerProvider
         GestureDetector(
           onTap: _toggleListening,
           child: AnimatedBuilder(
-            animation: _pulseAnimation,
+            animation: _breathingAnimation,
             builder: (context, child) {
-              return Transform.scale(
-                scale: _isListening ? _pulseAnimation.value : 1.0,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: _isListening
-                          ? [AppTheme.primaryColor, AppTheme.primaryColor.withValues(alpha: 0.7)]
-                          : [AppTheme.secondaryColor, AppTheme.secondaryColor.withValues(alpha: 0.8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (_isListening ? AppTheme.primaryColor : AppTheme.secondaryColor).withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 10),
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Ondas de expansión cuando está escuchando
+                  if (_isListening)
+                    ...List.generate(3, (index) {
+                      return Container(
+                        width: 70 * (_breathingAnimation.value + (index * 0.15)),
+                        height: 70 * (_breathingAnimation.value + (index * 0.15)),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1 - (index * 0.03)),
+                        ),
+                      );
+                    }),
+                  
+                  // Botón principal con efecto de crecimiento
+                  Transform.scale(
+                    scale: _isListening ? _breathingAnimation.value : 1.0,
+                    child: Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: _isListening
+                              ? [AppTheme.primaryColor, AppTheme.secondaryColor]
+                              : [AppTheme.secondaryColor, Colors.orange.shade400],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (_isListening ? AppTheme.primaryColor : AppTheme.secondaryColor).withValues(alpha: 0.5),
+                            blurRadius: _isListening ? 30 : 15,
+                            spreadRadius: _isListening ? 8 : 2,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Transform.scale(
+                        scale: _isListening ? 1.1 : 1.0,
+                        child: Center(
+                          child: FaIcon(
+                            _isListening ? FontAwesomeIcons.microphone : FontAwesomeIcons.microphoneLines,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  child: FaIcon(
-                    _isListening ? FontAwesomeIcons.microphone : FontAwesomeIcons.microphoneLines,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
+                ],
               );
             },
           ),
         ),
+        const SizedBox(height: 8),
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: _isListening ? 0 : 1,
+          child: Text(
+            'Asistente IA',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        if (_isListening)
+          FadeInUp(
+            child: Text(
+              '🎤 Habla ahora...',
+              style: TextStyle(
+                fontSize: 11,
+                color: AppTheme.primaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
       ],
     );
   }
 }
 
-// Un widget simple para simular los 3 puntos de escucha estilo ChatGPT
-class LottieListeningDots extends StatefulWidget {
-  const LottieListeningDots({super.key});
+// Widget personalizado para los 3 puntos de escucha estilo ChatGPT
+class ListeningDots extends StatefulWidget {
+  const ListeningDots({super.key});
 
   @override
-  State<LottieListeningDots> createState() => _LottieListeningDotsState();
+  State<ListeningDots> createState() => _ListeningDotsState();
 }
 
-class _LottieListeningDotsState extends State<LottieListeningDots> with SingleTickerProviderStateMixin {
+class _ListeningDotsState extends State<ListeningDots> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -180,7 +318,7 @@ class _LottieListeningDotsState extends State<LottieListeningDots> with SingleTi
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
+    )..repeat();
   }
 
   @override
@@ -197,12 +335,13 @@ class _LottieListeningDotsState extends State<LottieListeningDots> with SingleTi
         return AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            double delay = index * 0.2;
-            double value = (_controller.value - delay).clamp(0.0, 1.0);
+            double value = (_controller.value + (index * 0.33)) % 1.0;
+            double height = 8 + (value * 10);
+            
             return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
               width: 8,
-              height: 8 + (value * 8),
+              height: height,
               decoration: BoxDecoration(
                 color: AppTheme.primaryColor.withValues(alpha: 0.5 + (value * 0.5)),
                 borderRadius: BorderRadius.circular(4),

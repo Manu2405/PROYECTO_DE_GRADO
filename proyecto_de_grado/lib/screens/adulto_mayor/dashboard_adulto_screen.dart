@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../core/theme/app_theme.dart';
-import '../../widgets/ai_voice_button.dart';
+import '../../widgets/ai_voice_chat_screen.dart';
 import '../auth/login_screen.dart';
 
 class DashboardAdultoScreen extends StatelessWidget {
@@ -10,17 +10,33 @@ class DashboardAdultoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Nombre del usuario (puedes obtenerlo de tu sistema de autenticación)
+    final String userName = "Don Carlos";
+    
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          '¡Hola, Don Carlos!',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                color: AppTheme.primaryColor,
-                fontWeight: FontWeight.bold,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '¡Hola, $userName!',
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    color: AppTheme.primaryColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
+            ),
+            const Text(
+              'Bienvenido a tu gestión de salud',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.textSecondary,
               ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -42,8 +58,10 @@ class DashboardAdultoScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Tarjeta de próxima toma mejorada
                   FadeInDown(
                     child: Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -51,56 +69,161 @@ class DashboardAdultoScreen extends StatelessWidget {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(25),
                         boxShadow: const [
                           BoxShadow(
                             color: Colors.black12,
-                            blurRadius: 10,
-                            offset: Offset(0, 5),
+                            blurRadius: 15,
+                            offset: Offset(0, 8),
                           )
                         ],
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const FaIcon(FontAwesomeIcons.clock, color: Colors.white, size: 40),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Próxima Toma',
-                                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
-                                const SizedBox(height: 5),
-                                const Text(
-                                  'Losartán 50mg',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
+                                child: const FaIcon(
+                                  FontAwesomeIcons.clock,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                              const SizedBox(width: 15),
+                              const Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Próxima Toma',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Losartán 50mg',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    'En 15 min',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 5),
-                                const Text(
-                                  'A las 14:30 (En 15 min)',
-                                  style: TextStyle(color: Colors.white, fontSize: 18),
-                                ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          LinearProgressIndicator(
+                            value: 0.75,
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            '14:30',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
+                  
                   const SizedBox(height: 30),
+                  
+                  // Estadísticas rápidas
                   FadeInLeft(
-                    child: Text(
-                      'Tus Medicamentos de Hoy',
-                      style: Theme.of(context).textTheme.titleLarge,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.check_circle,
+                            title: 'Cumplimiento',
+                            value: '85%',
+                            color: AppTheme.successColor,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.medication,
+                            title: 'Medicamentos',
+                            value: '3',
+                            color: AppTheme.primaryColor,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.calendar_today,
+                            title: 'Días seguidos',
+                            value: '12',
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  
+                  const SizedBox(height: 30),
+                  
+                  FadeInLeft(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'Tus Medicamentos de Hoy',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            'Ver todos',
+                            style: TextStyle(color: AppTheme.primaryColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
                   const SizedBox(height: 15),
+                  
                   FadeInUp(
                     delay: const Duration(milliseconds: 200),
                     child: _MedicationCard(
@@ -108,7 +231,7 @@ class DashboardAdultoScreen extends StatelessWidget {
                       time: '08:00',
                       status: 'Tomado',
                       iconColor: AppTheme.successColor,
-                      icon: Icons.check_circle,
+                      statusIcon: Icons.check_circle,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -119,7 +242,7 @@ class DashboardAdultoScreen extends StatelessWidget {
                       time: '14:30',
                       status: 'Pendiente',
                       iconColor: AppTheme.secondaryColor,
-                      icon: Icons.access_time_filled,
+                      statusIcon: Icons.access_time_filled,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -130,27 +253,91 @@ class DashboardAdultoScreen extends StatelessWidget {
                       time: '20:00',
                       status: 'Pendiente',
                       iconColor: AppTheme.textSecondary,
-                      icon: Icons.access_time,
+                      statusIcon: Icons.access_time,
                     ),
                   ),
                   
-                  // Espacio para que el botón de IA no tape el contenido final
-                  const SizedBox(height: 120),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
           ),
           
-          // Botón IA posicionado en el centro inferior
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
-              child: AiVoiceButton(
-                onTap: () {
-                  // Acción adicional si es necesaria, la lógica ya está en el widget
-                },
-              ),
+          // Botón IA mejorado
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AiVoiceChatScreen(userName: userName),
+                  ),
+                );
+              },
+              backgroundColor: AppTheme.secondaryColor,
+              child: const FaIcon(FontAwesomeIcons.microphoneLines, color: Colors.white, size: 30),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppTheme.textSecondary,
             ),
           ),
         ],
@@ -164,51 +351,68 @@ class _MedicationCard extends StatelessWidget {
   final String time;
   final String status;
   final Color iconColor;
-  final IconData icon;
+  final IconData statusIcon;
 
   const _MedicationCard({
     required this.name,
     required this.time,
     required this.status,
     required this.iconColor,
-    required this.icon,
+    required this.statusIcon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: FaIcon(FontAwesomeIcons.pills, color: iconColor, size: 24),
+              child: const FaIcon(FontAwesomeIcons.pills, size: 20, color: AppTheme.primaryColor),
             ),
-            const SizedBox(width: 15),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    name, 
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   const SizedBox(height: 4),
-                  Text('Hora: $time', style: Theme.of(context).textTheme.bodyMedium),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time, size: 12, color: AppTheme.textSecondary),
+                      const SizedBox(width: 4),
+                      Text('Hora: $time', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12)),
+                    ],
+                  ),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             Column(
               children: [
-                Icon(icon, color: iconColor, size: 30),
+                Icon(statusIcon, color: iconColor, size: 24),
                 const SizedBox(height: 4),
                 Text(
                   status,
                   style: TextStyle(
                     color: iconColor,
                     fontWeight: FontWeight.bold,
+                    fontSize: 10,
                   ),
                 ),
               ],
