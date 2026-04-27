@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.proyecto_de_grado"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "25.2.9519653"
+    ndkVersion = "23.1.7779620"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -28,6 +28,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Mejora el rendimiento de compilación
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -35,7 +38,24 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            
+            // Optimizaciones para release
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
+        
+        // BuildType específico para desarrollo más rápido
+        create("development") {
+            initWith(buildTypes.getByName("debug"))
+            isDebuggable = true
+            applicationIdSuffix = ".dev"
+        }
+    }
+    
+    // Configuración para mejorar la velocidad de compilación
+    dexOptions {
+        preDexLibraries = true
+        maxProcessCount = 4
     }
 }
 
