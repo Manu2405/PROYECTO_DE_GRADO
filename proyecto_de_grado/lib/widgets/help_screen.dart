@@ -12,29 +12,6 @@ class HelpScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 4, bottom: 4),
-          child: ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
-              foregroundColor: Colors.white,
-              elevation: 4,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.arrow_back, size: 18),
-                SizedBox(width: 8),
-                Text('Volver', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-              ],
-            ),
-          ),
-        ),
         title: const Text(
           '¿Cómo usar el Asistente?',
           style: TextStyle(
@@ -44,6 +21,11 @@ class HelpScreen extends StatelessWidget {
           ),
         ),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.primaryColor, size: 24),
+          tooltip: 'Volver',
+        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -209,7 +191,34 @@ class HelpScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 30),
+                      
+                      // Botón de volver GRANDE en la parte inferior
+                      FadeInUp(
+                        delay: const Duration(milliseconds: 1200),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: ElevatedButton.icon(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back, size: 24),
+                            label: const Text(
+                              'Volver al asistente',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primaryColor,
+                              foregroundColor: Colors.white,
+                              elevation: 4,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),

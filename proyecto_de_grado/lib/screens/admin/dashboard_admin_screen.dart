@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../core/theme/app_theme.dart';
+import '../../../core/theme/app_theme.dart';
 import '../auth/login_screen.dart';
+import 'widgets/admin_stats_cards.dart';
+import 'widgets/admin_alerts_list.dart';
+import 'widgets/admin_users_list.dart';
+import 'widgets/admin_reports_tab.dart';
+import 'widgets/admin_management_tab.dart';
 
-class DashboardAdminScreen extends StatelessWidget {
+class DashboardAdminScreen extends StatefulWidget {
   const DashboardAdminScreen({super.key});
+
+  @override
+  State<DashboardAdminScreen> createState() => _DashboardAdminScreenState();
+}
+
+class _DashboardAdminScreenState extends State<DashboardAdminScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +40,18 @@ class DashboardAdminScreen extends StatelessWidget {
         title: const Text(
           'Administración Central',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          tabs: const [
+            Tab(text: '📊 Dashboard', icon: Icon(Icons.dashboard)),
+            Tab(text: '📋 Reportes', icon: Icon(Icons.report)),
+            Tab(text: '👥 Usuarios', icon: Icon(Icons.people)),
+            Tab(text: '⚙️ Gestión', icon: Icon(Icons.settings)),
+          ],
         ),
         actions: [
           IconButton(
@@ -30,155 +65,295 @@ class DashboardAdminScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FadeInDown(
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.blueGrey.shade800,
-                      child: const FaIcon(FontAwesomeIcons.buildingUser, color: Colors.white, size: 25),
-                    ),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Hogar "La Casa del Abuelo"',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Panel Operacional',
-                          style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              FadeInLeft(
-                child: Text(
-                  'Gestión del Sistema',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: FadeInUp(
-                      delay: const Duration(milliseconds: 200),
-                      child: _AdminMenuCard(
-                        icon: FontAwesomeIcons.usersGear,
-                        title: 'Usuarios y Roles',
-                        color: Colors.orange,
-                        onTap: () {},
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: FadeInUp(
-                      delay: const Duration(milliseconds: 300),
-                      child: _AdminMenuCard(
-                        icon: FontAwesomeIcons.link,
-                        title: 'Asignar Paciente a Cuidador',
-                        color: Colors.blue,
-                        onTap: () {},
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              FadeInLeft(
-                delay: const Duration(milliseconds: 400),
-                child: Text(
-                  'Reportes Institucionales',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const SizedBox(height: 15),
-              FadeInUp(
-                delay: const Duration(milliseconds: 500),
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                  child: const Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Tasa de Adherencia Global:', style: TextStyle(fontSize: 16)),
-                            Text('88%', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal)),
-                          ],
-                        ),
-                        Divider(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Alertas IA Activas:', style: TextStyle(fontSize: 16)),
-                            Text('4', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.red)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          AdminDashboardTab(),
+          AdminReportsTab(),
+          AdminUsersTab(),
+          AdminManagementTab(),
+        ],
       ),
     );
   }
 }
 
-class _AdminMenuCard extends StatelessWidget {
-  final dynamic icon;
-  final String title;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _AdminMenuCard({
-    required this.icon,
-    required this.title,
-    required this.color,
-    required this.onTap,
-  });
+// TAB 1: DASHBOARD
+class AdminDashboardTab extends StatelessWidget {
+  const AdminDashboardTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tarjeta de bienvenida
+              FadeInDown(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.blueGrey.shade800, Colors.blueGrey.shade600],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.white.withValues(alpha: 0.2),
+                        child: const Icon(Icons.business_center, color: Colors.white, size: 35),
+                      ),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Hogar "La Casa del Abuelo"',
+                              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Panel Operacional • ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                              style: const TextStyle(color: Colors.white70, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Tarjetas de estadísticas
+              FadeInLeft(
+                child: Text(
+                  'Estadísticas Generales',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              AdminStatsCards(
+                crossAxisCount: constraints.maxWidth > 600 ? 4 : 2,
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Gráfico de adherencia
+              FadeInLeft(
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  'Tasa de Adherencia por Mes',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              FadeInUp(
+                delay: const Duration(milliseconds: 300),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: SizedBox(
+                    height: 280,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Adherencia al tratamiento',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              Text(
+                                'Meta: 85%',
+                                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: _AdherenceChart(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Alertas y notificaciones
+              FadeInLeft(
+                delay: const Duration(milliseconds: 400),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Alertas Activas',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text('4 nuevas', style: TextStyle(color: Colors.white, fontSize: 12)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              const AdminAlertsList(),
+              
+              const SizedBox(height: 40),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Widget del gráfico de adherencia
+class _AdherenceChart extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Datos de adherencia por mes (Enero a Julio)
+    final months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'];
+    final adherenceData = [78.0, 82.0, 85.0, 80.0, 88.0, 86.0, 90.0];
+    final goal = 85.0;
+    
+    return Column(
+      children: [
+        // Gráfico de barras
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: List.generate(months.length, (index) {
+              final height = adherenceData[index] / 100;
+              final color = adherenceData[index] >= goal 
+                  ? AppTheme.successColor 
+                  : AppTheme.secondaryColor;
+              
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // Valor de porcentaje
+                      Text(
+                        '${adherenceData[index].toInt()}%',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Barra animada
+                      TweenAnimationBuilder(
+                        duration: const Duration(milliseconds: 800),
+                        tween: Tween<double>(begin: 0, end: height),
+                        curve: Curves.easeOutCubic,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [color, color.withValues(alpha: 0.7)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        builder: (context, double value, child) {
+                          return SizedBox(
+                            height: value * 150, // Altura máxima de 150px
+                            child: child,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      // Etiqueta del mes
+                      Text(
+                        months[index],
+                        style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
-        child: Column(
-          children: [
-            FaIcon(icon, color: color, size: 35),
-            const SizedBox(height: 15),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.bold),
-            ),
-          ],
+        const SizedBox(height: 16),
+        // Línea de meta
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 2,
+                    color: Colors.grey.shade400,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Meta: 85%',
+                    style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                  ),
+                  const Spacer(),
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: AppTheme.successColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Cumple meta',
+                    style: TextStyle(fontSize: 10, color: AppTheme.successColor),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: AppTheme.secondaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Por mejorar',
+                    style: TextStyle(fontSize: 10, color: AppTheme.secondaryColor),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

@@ -10,7 +10,6 @@ class DashboardAdultoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Nombre del usuario (puedes obtenerlo de tu sistema de autenticación)
     final String userName = "Don Carlos";
     
     return Scaffold(
@@ -58,7 +57,7 @@ class DashboardAdultoScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Tarjeta de próxima toma mejorada
+                  // Tarjeta de próxima toma
                   FadeInDown(
                     child: Container(
                       width: double.infinity,
@@ -158,6 +157,11 @@ class DashboardAdultoScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  
+                  const SizedBox(height: 30),
+                  
+                  // Tarjeta CENTRAL - Asistente de Voz CON ANIMACIÓN MEJORADA
+                  _buildAnimatedAssistantCard(context, userName),
                   
                   const SizedBox(height: 30),
                   
@@ -262,25 +266,129 @@ class DashboardAdultoScreen extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Botón IA mejorado
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => AiVoiceChatScreen(userName: userName),
-                  ),
-                );
-              },
-              backgroundColor: AppTheme.secondaryColor,
-              child: const FaIcon(FontAwesomeIcons.microphoneLines, color: Colors.white, size: 30),
-            ),
-          ),
         ],
+      ),
+    );
+  }
+
+  // Tarjeta con animación mejorada
+  Widget _buildAnimatedAssistantCard(BuildContext context, String userName) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AiVoiceChatScreen(userName: userName),
+            ),
+          );
+        },
+        child: ElasticIn(
+          delay: const Duration(milliseconds: 100),
+          child: TweenAnimationBuilder(
+            duration: const Duration(seconds: 2),
+            tween: Tween<double>(begin: 1.0, end: 1.02),
+            builder: (context, double scale, child) {
+              return Transform.scale(
+                scale: scale,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppTheme.secondaryColor, AppTheme.primaryColor],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryColor.withValues(alpha: 0.4),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Icono con animación de respiración
+                      TweenAnimationBuilder(
+                        duration: const Duration(seconds: 1),
+                        tween: Tween<double>(begin: 1.0, end: 1.1),
+                        builder: (context, double iconScale, child) {
+                          return Transform.scale(
+                            scale: iconScale,
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const FaIcon(
+                                FontAwesomeIcons.microphoneLines,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      // Texto principal
+                      const Text(
+                        'Asistente de Voz Inteligente',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Habla con $userName',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Badge informativo con animación
+                      TweenAnimationBuilder(
+                        duration: const Duration(seconds: 1),
+                        tween: Tween<double>(begin: 1.0, end: 1.05),
+                        builder: (context, double badgeScale, child) {
+                          return Transform.scale(
+                            scale: badgeScale,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.touch_app, color: Colors.white, size: 16),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Toca para empezar a hablar',
+                                    style: TextStyle(color: Colors.white, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -301,46 +409,48 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+    return ElasticIn(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 10,
+              offset: Offset(0, 2),
             ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 18),
             ),
-          ),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppTheme.textSecondary,
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -363,61 +473,63 @@ class _MedicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
+    return ElasticIn(
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const FaIcon(FontAwesomeIcons.pills, size: 20, color: AppTheme.primaryColor),
               ),
-              child: const FaIcon(FontAwesomeIcons.pills, size: 20, color: AppTheme.primaryColor),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name, 
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name, 
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 12, color: AppTheme.textSecondary),
+                        const SizedBox(width: 4),
+                        Text('Hora: $time', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                children: [
+                  Icon(statusIcon, color: iconColor, size: 24),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.access_time, size: 12, color: AppTheme.textSecondary),
-                      const SizedBox(width: 4),
-                      Text('Hora: $time', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12)),
-                    ],
+                  Text(
+                    status,
+                    style: TextStyle(
+                      color: iconColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              children: [
-                Icon(statusIcon, color: iconColor, size: 24),
-                const SizedBox(height: 4),
-                Text(
-                  status,
-                  style: TextStyle(
-                    color: iconColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

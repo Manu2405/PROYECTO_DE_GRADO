@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import '../../core/theme/app_theme.dart';
-import 'auth/login_screen.dart';
+import '../core/theme/app_theme.dart';
+import 'welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
         );
       }
     });
@@ -38,6 +38,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 150,
                 height: 150,
                 decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
@@ -47,10 +52,11 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/icono.png',
-                    fit: BoxFit.cover,
+                child: const Center(
+                  child: Icon(
+                    Icons.health_and_safety,
+                    color: Colors.white,
+                    size: 70,
                   ),
                 ),
               ),
