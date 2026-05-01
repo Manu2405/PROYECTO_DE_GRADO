@@ -13,7 +13,14 @@ import 'screens/adulto_mayor/dashboard_adulto_screen.dart';
 import 'screens/familiar_cuidador/dashboard_familiar_screen.dart';
 import 'screens/medico/dashboard_medico_screen.dart';
 import 'screens/admin/dashboard_admin_screen.dart';
-
+import 'screens/web/web_login_screen.dart';
+import 'screens/web/web_welcome_screen.dart';
+import 'screens/web/web_register_screen.dart';
+import 'screens/web/web_recover_password_screen.dart';
+import 'screens/web/web_profile_screen.dart';
+import 'screens/web/dashboard_familiar_web_screen.dart';
+import 'screens/web/dashboard_medico_web_screen.dart';
+import 'screens/web/dashboard_admin_web_screen.dart';
 void main() {
   runApp(const VitaSeniorApp());
 }
@@ -39,6 +46,14 @@ class VitaSeniorApp extends StatelessWidget {
         '/familiar': (context) => const DashboardFamiliarScreen(),
         '/medico': (context) => const DashboardMedicoScreen(),
         '/admin': (context) => const DashboardAdminScreen(),
+        '/web/login': (context) => const WebLoginScreen(),
+        '/web/welcome': (context) => const WebWelcomeScreen(),
+        '/web/register': (context) => const WebRegisterScreen(),
+        '/web/recover': (context) => const WebRecoverPasswordScreen(),
+        '/web/profile': (context) => const WebProfileScreen(),
+        '/web/familiar': (context) => const DashboardFamiliarWebScreen(),
+        '/web/medico': (context) => const DashboardMedicoWebScreen(),
+        '/web/admin': (context) => const DashboardAdminWebScreen(),
       },
       builder: (context, child) {
         return ConnectivityWrapper(child: child!);

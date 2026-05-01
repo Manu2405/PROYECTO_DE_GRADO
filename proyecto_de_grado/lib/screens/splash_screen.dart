@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../core/theme/app_theme.dart';
 import 'welcome_screen.dart';
 
@@ -16,10 +17,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-        );
+        if (kIsWeb) {
+          Navigator.pushReplacementNamed(context, '/web/welcome');
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+          );
+        }
       }
     });
   }
