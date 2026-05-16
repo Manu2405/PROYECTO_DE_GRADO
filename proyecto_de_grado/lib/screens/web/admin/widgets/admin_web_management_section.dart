@@ -3,11 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '/../../../core/theme/app_theme.dart';
 
 class AdminWebManagementSection extends StatelessWidget {
-  final bool isDarkMode;
-
   const AdminWebManagementSection({
     super.key,
-    this.isDarkMode = false,
   });
 
   @override
@@ -18,12 +15,22 @@ class AdminWebManagementSection extends StatelessWidget {
     final isLargeScreen = screenWidth >= 900 && screenWidth < 1200;
     final isExtraLarge = screenWidth >= 1200;
     
-    // Colores según modo oscuro/claro
-    final cardColor = isDarkMode ? const Color(0xFF2D2D2D) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.grey[800];
-    final secondaryTextColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
-    final systemStatusBgColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.grey[50];
-    final systemStatusBorderColor = isDarkMode ? Colors.grey[800]! : Colors.grey[200]!;
+    // Colores del login (fondo oscuro)
+    final bgGradient = const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF0A1929),
+        Color(0xFF0F2B3D),
+        Color(0xFF1A3A4F),
+        Color(0xFF1A1A2E),
+      ],
+    );
+    
+    final cardColor = const Color(0xFF0F2B3D).withValues(alpha: 0.6);
+    final borderColor = Colors.white.withValues(alpha: 0.1);
+    final textColor = Colors.white;
+    final secondaryTextColor = Colors.white.withValues(alpha: 0.7);
     
     // Ajustar número de columnas según el tamaño
     int crossAxisCount = 1;
@@ -48,33 +55,42 @@ class AdminWebManagementSection extends StatelessWidget {
     final fontSizeTitle = isSmallScreen ? 20.0 : 28.0;
     final fontSizeSubtitle = isSmallScreen ? 12.0 : 14.0;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Encabezado responsivo
-          Container(
-            padding: EdgeInsets.all(horizontalPadding),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppTheme.primaryColor, AppTheme.primaryColor.withValues(alpha: 0.8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return Container(
+      decoration: BoxDecoration(gradient: bgGradient),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Encabezado responsivo
+            Padding(
+              padding: EdgeInsets.all(horizontalPadding),
+              child: Container(
+                padding: EdgeInsets.all(horizontalPadding),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.primaryColor, Color(0xFF0EA5E9)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Row(
                   children: [
                     Container(
                       padding: EdgeInsets.all(isSmallScreen ? 10 : 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(isSmallScreen ? 10 : 12),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       ),
-                      child: Icon(Icons.settings, color: Colors.white, size: isSmallScreen ? 24 : 28),
+                      child: Icon(Icons.settings_rounded, color: Colors.white, size: isSmallScreen ? 24 : 28),
                     ),
                     SizedBox(width: isSmallScreen ? 12 : 16),
                     Expanded(
@@ -94,7 +110,7 @@ class AdminWebManagementSection extends StatelessWidget {
                             'Administra la configuración global de la plataforma',
                             style: GoogleFonts.inter(
                               fontSize: fontSizeSubtitle,
-                              color: Colors.white70,
+                              color: Colors.white.withValues(alpha: 0.85),
                             ),
                           ),
                         ],
@@ -102,117 +118,118 @@ class AdminWebManagementSection extends StatelessWidget {
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-          SizedBox(height: isSmallScreen ? 24 : 32),
-          
-          // Grid de tarjetas responsivo
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: isSmallScreen ? 12 : 20,
-              mainAxisSpacing: isSmallScreen ? 12 : 20,
-              childAspectRatio: childAspectRatio,
-            ),
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              final cards = [
-                {'title': 'Configuración General', 'description': 'Ajustes globales de la plataforma', 'icon': Icons.settings, 'color': Colors.blue},
-                {'title': 'Roles y Permisos', 'description': 'Gestiona los roles y permisos de usuarios', 'icon': Icons.security, 'color': Colors.green},
-                {'title': 'Notificaciones', 'description': 'Configura las notificaciones del sistema', 'icon': Icons.notifications, 'color': Colors.orange},
-                {'title': 'Respaldos', 'description': 'Gestiona los respaldos de datos', 'icon': Icons.backup, 'color': Colors.purple},
-                {'title': 'Auditoría', 'description': 'Registro de actividades del sistema', 'icon': Icons.history, 'color': Colors.red},
-                {'title': 'Mantenimiento', 'description': 'Herramientas de mantenimiento', 'icon': Icons.build, 'color': Colors.teal},
-              ];
-              return _buildManagementCard(
-                cards[index]['title'] as String,
-                cards[index]['description'] as String,
-                cards[index]['icon'] as IconData,
-                cards[index]['color'] as Color,
-                () => _showComingSoonDialog(context, cards[index]['title'] as String),
-                isSmallScreen,
-              );
-            },
-          ),
-          
-          SizedBox(height: isSmallScreen ? 24 : 32),
-          
-          // Sección de estado del sistema responsiva
-          Container(
-            padding: EdgeInsets.all(horizontalPadding),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+            
+            SizedBox(height: isSmallScreen ? 24 : 32),
+            
+            // Grid de tarjetas responsivo
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: isSmallScreen ? 12 : 20,
+                  mainAxisSpacing: isSmallScreen ? 12 : 20,
+                  childAspectRatio: childAspectRatio,
                 ),
-              ],
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  final cards = [
+                    {'title': 'Configuración General', 'description': 'Ajustes globales de la plataforma', 'icon': Icons.settings_rounded, 'color': const Color(0xFF0EA5E9)},
+                    {'title': 'Roles y Permisos', 'description': 'Gestiona los roles y permisos de usuarios', 'icon': Icons.security_rounded, 'color': const Color(0xFF10B981)},
+                    {'title': 'Notificaciones', 'description': 'Configura las notificaciones del sistema', 'icon': Icons.notifications_rounded, 'color': const Color(0xFFF59E0B)},
+                    {'title': 'Respaldos', 'description': 'Gestiona los respaldos de datos', 'icon': Icons.backup_rounded, 'color': const Color(0xFF8B5CF6)},
+                    {'title': 'Auditoría', 'description': 'Registro de actividades del sistema', 'icon': Icons.history_rounded, 'color': const Color(0xFFEF4444)},
+                    {'title': 'Mantenimiento', 'description': 'Herramientas de mantenimiento', 'icon': Icons.build_rounded, 'color': const Color(0xFF14B8A6)},
+                  ];
+                  return _buildManagementCard(
+                    cards[index]['title'] as String,
+                    cards[index]['description'] as String,
+                    cards[index]['icon'] as IconData,
+                    cards[index]['color'] as Color,
+                    () => _showComingSoonDialog(context, cards[index]['title'] as String),
+                    isSmallScreen,
+                  );
+                },
+              ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Estado del Sistema',
-                  style: GoogleFonts.poppins(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                SizedBox(height: isSmallScreen ? 12 : 16),
-                Wrap(
-                  spacing: isSmallScreen ? 12 : 20,
-                  runSpacing: isSmallScreen ? 12 : 20,
-                  alignment: WrapAlignment.start,
-                  children: [
-                    _buildSystemStatus('Versión', '2.0.0', Icons.info_outline, null, isSmallScreen),
-                    _buildSystemStatus('Última Actualización', '15/01/2024', Icons.update, null, isSmallScreen),
-                    _buildSystemStatus('Estado', 'Operativo', Icons.check_circle, Colors.green, isSmallScreen),
-                    _buildSystemStatus('Espacio Usado', '45%', Icons.storage, null, isSmallScreen),
-                    _buildSystemStatus('Base de Datos', 'Conectada', Icons.cloud_queue, Colors.green, isSmallScreen),
-                    _buildSystemStatus('API', 'Online', Icons.api, Colors.green, isSmallScreen),
+            
+            SizedBox(height: isSmallScreen ? 24 : 32),
+            
+            // Sección de estado del sistema responsiva
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Container(
+                padding: EdgeInsets.all(horizontalPadding),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
+                  border: Border.all(color: borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
-              ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Estado del Sistema',
+                      style: GoogleFonts.poppins(
+                        fontSize: isSmallScreen ? 16 : 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: isSmallScreen ? 12 : 16),
+                    Wrap(
+                      spacing: isSmallScreen ? 12 : 20,
+                      runSpacing: isSmallScreen ? 12 : 20,
+                      alignment: WrapAlignment.start,
+                      children: [
+                        _buildSystemStatus('Versión', '3.0.0', Icons.info_outline_rounded, null, isSmallScreen),
+                        _buildSystemStatus('Última Actualización', '15/01/2024', Icons.update_rounded, null, isSmallScreen),
+                        _buildSystemStatus('Estado', 'Operativo', Icons.check_circle_rounded, const Color(0xFF10B981), isSmallScreen),
+                        _buildSystemStatus('Espacio Usado', '45%', Icons.storage_rounded, null, isSmallScreen),
+                        _buildSystemStatus('Base de Datos', 'Conectada', Icons.cloud_queue_rounded, const Color(0xFF10B981), isSmallScreen),
+                        _buildSystemStatus('API', 'Online', Icons.api_rounded, const Color(0xFF10B981), isSmallScreen),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          
-          SizedBox(height: isSmallScreen ? 16 : 24),
-        ],
+            
+            SizedBox(height: isSmallScreen ? 16 : 24),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildManagementCard(String title, String description, IconData icon, Color color, VoidCallback onTap, bool isSmallScreen) {
-    final cardBgColor = isDarkMode ? const Color(0xFF2D2D2D) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.grey[800];
-    final descColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
-    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
       child: Container(
         padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
         decoration: BoxDecoration(
-          color: cardBgColor,
+          color: const Color(0xFF0F2B3D).withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
-              offset: const Offset(0, 2),
+              offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: color.withValues(alpha: 0.2),
-            width: 1,
-          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +260,7 @@ class AdminWebManagementSection extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: isSmallScreen ? 14 : 16,
                 fontWeight: FontWeight.bold,
-                color: textColor,
+                color: Colors.white,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -253,7 +270,7 @@ class AdminWebManagementSection extends StatelessWidget {
               description,
               style: GoogleFonts.inter(
                 fontSize: isSmallScreen ? 11 : 12,
-                color: descColor,
+                color: Colors.white.withValues(alpha: 0.6),
                 height: 1.4,
               ),
               maxLines: 2,
@@ -272,7 +289,7 @@ class AdminWebManagementSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: isSmallScreen ? 2 : 4),
-                Icon(Icons.arrow_forward, size: isSmallScreen ? 12 : 14, color: color),
+                Icon(Icons.arrow_forward_rounded, size: isSmallScreen ? 12 : 14, color: color),
               ],
             ),
           ],
@@ -282,11 +299,8 @@ class AdminWebManagementSection extends StatelessWidget {
   }
 
   Widget _buildSystemStatus(String label, String value, IconData icon, Color? color, bool isSmallScreen) {
-    final bgColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.grey[50];
-    final borderColor = isDarkMode ? Colors.grey[800]! : Colors.grey[200]!;
-    final labelColor = isDarkMode ? Colors.grey[500] : Colors.grey[500];
-    final valueColor = isDarkMode ? Colors.white : (color ?? Colors.grey[800]);
-    final iconColor = color ?? (isDarkMode ? Colors.grey[400] : Colors.grey[600]);
+    final iconColor = color ?? Colors.white.withValues(alpha: 0.5);
+    final valueColor = color ?? Colors.white;
     
     return Container(
       padding: EdgeInsets.symmetric(
@@ -294,9 +308,9 @@ class AdminWebManagementSection extends StatelessWidget {
         vertical: isSmallScreen ? 10 : 12,
       ),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: const Color(0xFF0A1929).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(isSmallScreen ? 10 : 12),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -310,7 +324,7 @@ class AdminWebManagementSection extends StatelessWidget {
                 label,
                 style: GoogleFonts.inter(
                   fontSize: isSmallScreen ? 10 : 11,
-                  color: labelColor,
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
               ),
               Text(
@@ -330,20 +344,18 @@ class AdminWebManagementSection extends StatelessWidget {
 
   void _showComingSoonDialog(BuildContext context, String feature) {
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
-    final dialogBgColor = isDarkMode ? const Color(0xFF2D2D2D) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.grey[800];
-    final descColor = isDarkMode ? Colors.grey[400] : Colors.grey[600];
     
     showDialog(
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20)),
+        backgroundColor: const Color(0xFF0F2B3D),
         child: Container(
           width: isSmallScreen ? double.infinity : 400,
           padding: EdgeInsets.all(isSmallScreen ? 20 : 24),
           decoration: BoxDecoration(
-            color: dialogBgColor,
             borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -351,10 +363,12 @@ class AdminWebManagementSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.1),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0EA5E9), AppTheme.primaryColor],
+                  ),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.construction, color: Colors.blue, size: isSmallScreen ? 40 : 48),
+                child: const Icon(Icons.construction_rounded, color: Colors.white, size: 40),
               ),
               const SizedBox(height: 16),
               Text(
@@ -362,7 +376,7 @@ class AdminWebManagementSection extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: isSmallScreen ? 18 : 20,
                   fontWeight: FontWeight.bold,
-                  color: textColor,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
@@ -371,7 +385,7 @@ class AdminWebManagementSection extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: isSmallScreen ? 12 : 14,
-                  color: descColor,
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 20),
@@ -380,12 +394,13 @@ class AdminWebManagementSection extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: AppTheme.primaryColor,
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: isSmallScreen ? 8 : 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 0,
                   ),
                   child: const Text('Entendido'),
                 ),
